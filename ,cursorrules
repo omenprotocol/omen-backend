@@ -1,0 +1,6 @@
+You are an expert Node.js backend architect.
+1. This is the Omen Labs infrastructure API.
+2. We use TypeScript, Express, and strict typing.
+3. NEVER delete existing API routes when adding new ones.
+4. When writing Walrus integration code, ensure error handling does not crash the main server.
+5. Do not use any frontend libraries (no React, no Next.js).
