@@ -1,0 +1,45 @@
+# ============================================================
+# OMEN BACKEND — .gitignore
+# ============================================================
+
+# ── Environment — NEVER commit these ─────────────────────────
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# ── Build output ──────────────────────────────────────────────
+dist/
+build/
+
+# ── Node ──────────────────────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ── TypeScript ────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ── Logs ──────────────────────────────────────────────────────
+logs/
+*.log
+
+# ── OS ────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ───────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Keys / secrets — belt and suspenders ──────────────────────
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/

@@ -1,0 +1,42 @@
+{
+  "name": "omen-backend",
+  "version": "1.0.0",
+  "description": "Omen Protocol off-chain backend: indexer, REST API, MCP server, AI auditor, zkLogin agent",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev":           "tsx index.ts",
+    "build":         "tsc",
+    "start":         "node dist/index.js",
+    "mcp":           "tsx audit/mcp/server.ts",
+    "audit:run":     "tsx audit/oracle/auditor.ts",
+    "agent:session": "tsx audit/oracle/agent.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-kms":           "^3.600.0",
+    "@modelcontextprotocol/sdk":     "^1.0.0",
+    "@mysten/sui":                   "^1.45.2",
+    "cors":                          "^2.8.6",
+    "dotenv":                        "^17.3.1",
+    "express":                       "^5.2.1",
+    "express-rate-limit":            "^7.3.0",
+    "jwt-decode":                    "^4.0.0",
+    "pg":                            "^8.19.0",
+    "rate-limit-redis":              "^4.2.0",
+    "redis":                         "^5.11.0",
+    "ws":                            "^8.19.0",
+    "zod":                           "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/cors":       "^2.8.17",
+    "@types/express":    "^5.0.6",
+    "@types/node":       "^25.3.1",
+    "@types/pg":         "^8.16.0",
+    "@types/ws":         "^8.18.1",
+    "tsx":               "^4.21.0",
+    "typescript":        "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
