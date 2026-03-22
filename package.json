@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "dev":           "tsx index.ts",
-    "build":         "tsc",
-    "start":         "node dist/index.js",
+    "build":         "echo 'no build step'",
+    "start":         "tsx index.ts",
     "mcp":           "tsx audit/mcp/server.ts",
     "audit:run":     "tsx audit/oracle/auditor.ts",
     "agent:session": "tsx audit/oracle/agent.ts"
