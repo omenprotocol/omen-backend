@@ -247,7 +247,7 @@ async function handleEvent(event: SuiEvent): Promise<void> {
       await removePeerReview(e.target_address ?? e.target_badge_id, e.reviewer_badge_id);
       console.log(`[Indexer] PeerReview removed: ${e.target_badge_id?.slice(0, 10)}...`);
 
-    // ── omen_router module ─────────────────────────────────────────────────
+    // ── router module ─────────────────────────────────────────────────
 
     } else if (type === E.TrustGatePassed) {
       await recordGatedTrade({
@@ -305,6 +305,100 @@ async function handleEvent(event: SuiEvent): Promise<void> {
     } else if (type === E.CircuitReset) {
       await redisClient.del(`omen:pool:${e.pool_config_id ?? e.pool_id}`);
       console.log(`[Indexer] CircuitReset: ${(e.pool_config_id ?? e.pool_id)?.slice(0, 10)}...`);
+
+    } else if (type === E.AuditStaleRejected) {
+      await redisClient.del(`omen:pool:${e.pool_config_id ?? e.pool_id}`);
+      console.warn(`[Indexer] AuditStaleRejected: pool=${(e.pool_config_id ?? e.pool_id)?.slice(0, 10)}...`);
+
+    // ── omen_agent module ──────────────────────────────────────────────────
+
+    } else if (type === E.AgentBadgeMinted) {
+      await pool.query(
+        `INSERT INTO creator_profiles (address, badge_id, name, tier, is_verified, is_active, trust_score, risk_score, walrus_blob_id, issue_date, updated_at)
+         VALUES ($1, $2, 'Agent', 0, true, true, $3, 0, '', $4, NOW())
+         ON CONFLICT (address) DO UPDATE SET
+           badge_id = $2, trust_score = $3, is_verified = true, is_active = true, updated_at = NOW()`,
+        [e.agent_address, e.agent_badge_id, Number(e.trust_score ?? 0), Number(e.timestamp ?? 0)]
+      );
+      await invalidateAddressCache(e.agent_address);
+      console.log(`[Indexer] AgentBadgeMinted: ${e.agent_address?.slice(0, 10)}...`);
+
+    } else if (type === E.AgentSlashed) {
+      await pool.query(
+        `UPDATE creator_profiles SET trust_score = 0, badge_status = 'slashed', is_active = FALSE, updated_at = NOW()
+         WHERE address = $1`,
+        [e.agent_address]
+      );
+      await invalidateAddressCache(e.agent_address);
+      console.warn(`[Indexer] AgentSlashed: ${e.agent_address?.slice(0, 10)}...`);
+
+    } else if (type === E.AgentDeactivated) {
+      await pool.query(
+        `UPDATE creator_profiles SET is_active = FALSE, updated_at = NOW() WHERE address = $1`,
+        [e.agent_address]
+      );
+      await invalidateAddressCache(e.agent_address);
+      console.log(`[Indexer] AgentDeactivated: ${e.agent_address?.slice(0, 10)}...`);
+
+    // ── omen_registry stake + bond events ─────────────────────────────────
+
+    } else if (type === E.StakeDeposited) {
+      console.log(`[Indexer] StakeDeposited: ${e.creator_address?.slice(0, 10)}... amount=${e.amount}`);
+
+    } else if (type === E.StakeSlashed) {
+      await invalidateAddressCache(e.creator_address);
+      console.warn(`[Indexer] StakeSlashed: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.StakeReturned) {
+      console.log(`[Indexer] StakeReturned: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.BondDeposited) {
+      console.log(`[Indexer] BondDeposited: ${e.creator_address?.slice(0, 10)}... amount=${e.amount}`);
+
+    } else if (type === E.BondSeized) {
+      await invalidateAddressCache(e.creator_address);
+      console.warn(`[Indexer] BondSeized: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.BondReleased) {
+      console.log(`[Indexer] BondReleased: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.AuditorProposalCreated) {
+      console.log(`[Indexer] AuditorProposalCreated: ${e.applicant?.slice(0, 10)}...`);
+
+    } else if (type === E.AuditorProposalApproved) {
+      console.log(`[Indexer] AuditorProposalApproved: ${e.applicant?.slice(0, 10)}...`);
+
+    } else if (type === E.AuditorBadgeExecuted) {
+      console.log(`[Indexer] AuditorBadgeExecuted: ${e.auditor_address?.slice(0, 10)}...`);
+
+    // ── omen_badge recovery events ─────────────────────────────────────────
+
+    } else if (type === E.RecoveryProposed) {
+      console.log(`[Indexer] RecoveryProposed: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.RecoveryExecuted) {
+      await invalidateAddressCache(e.creator_address);
+      console.log(`[Indexer] RecoveryExecuted: ${e.creator_address?.slice(0, 10)}...`);
+
+    } else if (type === E.RecoveryCancelled) {
+      console.log(`[Indexer] RecoveryCancelled: ${e.creator_address?.slice(0, 10)}...`);
+
+    // ── vault module ───────────────────────────────────────────────────────
+
+    } else if (type === E.VaultCreated) {
+      console.log(`[Indexer] VaultCreated: ${e.creator_address?.slice(0, 10)}... vault=${e.vault_id?.slice(0, 10)}...`);
+
+    } else if (type === E.Subscribed) {
+      console.log(`[Indexer] Subscribed to vault: ${e.vault_id?.slice(0, 10)}...`);
+
+    } else if (type === E.EmergencyWithdraw) {
+      console.warn(`[Indexer] EmergencyWithdraw: vault=${e.vault_id?.slice(0, 10)}...`);
+
+    } else if (type === E.EmergencyModeActivated) {
+      console.warn(`[Indexer] EmergencyModeActivated: vault=${e.vault_id?.slice(0, 10)}...`);
+
+    } else if (type === E.EmergencyModeCleared) {
+      console.log(`[Indexer] EmergencyModeCleared: vault=${e.vault_id?.slice(0, 10)}...`);
     }
 
   } catch (err) {
