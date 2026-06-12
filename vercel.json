@@ -1,7 +1,6 @@
 {
   "version": 2,
   "buildCommand": "echo 'no build'",
-  "outputDirectory": ".",
   "rewrites": [
     { "source": "/api/score/:address", "destination": "/api/score/[address]" },
     { "source": "/api/profile/:address", "destination": "/api/profile/[address]" }
