@@ -1,0 +1,15 @@
+{
+  "rewrites": [
+    { "source": "/api/score/:address", "destination": "/api/score/[address]" },
+    { "source": "/api/profile/:address", "destination": "/api/profile/[address]" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    }
+  ]
+}
