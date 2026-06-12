@@ -1,0 +1,6 @@
+sources/
+audit/
+scripts/
+config.ts
+index.ts
+schema.sql
