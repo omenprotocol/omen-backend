@@ -1,0 +1,28 @@
+{
+  "buildCommand": "echo 'no build'",
+  "outputDirectory": ".",
+  "functions": {
+    "api/score/[address].js": {
+      "runtime": "nodejs20.x"
+    },
+    "api/profile/[address].js": {
+      "runtime": "nodejs20.x"
+    },
+    "api/apply.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/score/:address", "destination": "/api/score/[address]" },
+    { "source": "/api/profile/:address", "destination": "/api/profile/[address]" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "no-store, max-age=0" }
+      ]
+    }
+  ]
+}
